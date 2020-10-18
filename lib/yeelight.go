@@ -2,6 +2,7 @@ package lib
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	json "github.com/json-iterator/go"
 	"math/rand"
@@ -207,4 +208,25 @@ func (m *Light) SendCommand(cmd Command) (string, error) {
 
 	return bufio.NewReader(conn).ReadString('\n')
 
+}
+
+type RGB struct {
+	R, G, B int
+}
+
+func HTMLToRGB(in string) (RGB, error) {
+	if in[0] == '#' {
+		in = in[1:]
+	}
+
+	if len(in) != 6 {
+		return RGB{}, errors.New("Invalid string length")
+	}
+
+	var r, g, b byte
+	if n, err := fmt.Sscanf(in, "%2x%2x%2x", &r, &g, &b); err != nil || n != 3 {
+		return RGB{}, err
+	}
+
+	return RGB{int(r) / 255, int(g) / 255, int(b) / 255}, nil
 }
